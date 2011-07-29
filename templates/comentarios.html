@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Comentarios - Sprint {{ sprint.name }} - Tarefa {{ task.name }}
+{% endblock %}
+
+{% block body %}
+    <ul style="list-style: none;">
+        {% if comments %}
+            {% for comment in comments %}
+                <li>
+                    <hr />
+                    <b>{{ comment.created_by }}</b> - {{ comment.created_at }}<br />
+                    {{ comment.comment }}
+                </li>
+            {% endfor %}
+        {% else %}
+            <li>
+                Nenhum comentario foi feito.
+            </li>
+        {% endif %}
+    </ul>
+<form method="POST" action=".">{% csrf_token %}
+    {{ form.as_p }}
+    <br />
+    <input type="submit" value="Comentar">
+    <input type="hidden" name="sprint_id" value="{{ sprint_id }}">
+    <input type="hidden" name="task_id" value="{{ task_id }}">
+    <input type="hidden" name="user_id" value="{{ user_id }}">
+    <input type="hidden" name="sprinttask_id" value="{{ sprinttask_id }}">
+</form>
+{% endblock %}

@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Scrum Board
+{% endblock %}
+{% block body %}
+<table class="corpo" cellspacing="5px" >
+    <tr>
+        <td class="historias">História</td>
+        <td class="status">Nova</td>
+        <td class="status">Andamento</td>
+        <td class="status">Revisando</td>
+        <td class="status">Completa</td>
+    </tr>
+    {% if historias %}
+        {% for historia, status in historias.items %}
+        <tr>
+            <td>
+                <div>
+                    <b>História:</b>
+                    <br />
+                    {{ historia.name }}
+                    <br />
+                    <b>Descrição:</b>
+                    <br />
+                    {{ historia.description }}
+                </div>
+            </td>
+            {% for statu, tarefas in status.items %}
+                <td class="status-historia-{{ historia.pk }} status-{{ statu }}" id="{{ statu }}">
+                    {% for task in tarefas %}
+                        <div class="portlet" id="task-{{ task.pk }}" >
+                            <div class="portlet-header .ui-icon">
+                                <div class="task_name">
+                                    <span class="pontuacao">{{ task.weight }}</span>
+                                    {{ task.name }}
+                                </div>
+                            </div>
+                            <div class="portlet-content">
+                                <b>Tipo:</b> {{ task.type }}
+                                <br/>
+                                <b>Responsável:</b> <span id="task-responsavel-{{ task.pk }}">{% if task.resp %}{{ task.resp }}{% else %}Ninguém (<span style="color: red;" onclick="javascript:pegarTask('{{ task.id }}')">Pegar</span>){% endif %}</span>
+                                <br />
+                                <b>Comentários:</b> {{ task.comments }} <span class="off_links" onclick="javascript:abrirComentarios('{{ task.pk }}');"> <img src="/media/img/plus.gif" width="16px" height="16px" /></span>
+                                <br />
+                                <b>Lançar Horas:</b> <span id="tt-wh-{{ task.pk }}">{{ task.work_hours }}</span> <span class="off_links" onclick="javascript:lancarHora('{{ task.pk }}')"> <img src="/media/img/plus.gif" width="16px" height="16px" /></span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </td>
+            {% endfor %}
+        </tr>
+            {% endfor %}
+        {% else %}
+            Nenhuma história
+        {% endif %}
+   </table>
+    
+</div>
+{% endblock %}
+{% block end_scripts %}
+<script>
+    $( ".portlet" ).addClass( "ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" )
+        .find( ".portlet-header" )
+        .addClass( "ui-widget-header ui-corner-all" )
+        .prepend( "<span class='ui-icon ui-icon-minusthick'></span>")
+        .end()
+        .find( ".portlet-content" );
+    $( ".portlet-header .ui-icon" ).click(function() {
+        $( this ).toggleClass( "ui-icon-minusthick" ).toggleClass( "ui-icon-plusthick" );
+        $( this ).parents( ".portlet:first" ).find( ".portlet-content" ).toggle();
+    });
+
+    {% if historias %}
+        {% for historia in historias %}
+            $(".status-historia-{{ historia.pk }}").sortable({
+                connectWith: ".status-historia-{{ historia.pk }}",
+                 //placeholder: 'dragHelper',
+                scroll: true,
+                revert: true,
+                stop: function(a, ui) {
+                    var id = $(ui.item).attr("id");
+                    var status = $("#"+id).parent().attr('id');
+                    id = id.split("-");
+                    id = id[1];
+                    console.log(id + "," + status);
+                    $.ajax({
+                       url: '/changeTaskStatus/',
+                       type: 'GET',
+                       data: {
+                           'task_id':id,
+                           'new_status':status
+                       },
+                       success: function(retorno){
+                           if (retorno == "ok"){
+                               console.log("Atualizado com sucesso!");
+                           }else{
+                               console.log("Falha: " + retorno);
+                           }
+                       }
+                    });
+                }
+            });
+            $( ".status-historia-{{ historia.pk }}" ).disableSelection();
+        {% endfor %}
+    {% endif %}
+    function pegarTask(task_id){
+        $.ajax({
+            url:'/pegarTask/',
+            type: 'GET',
+            data: {
+                'task_id' : task_id,
+                'user_id' : {{ request.user.pk }},
+                'sprint_id' : {{ sprint_id }}
+            },
+            success: function(retorno){
+                if (retorno == 'ok'){
+                    $("#task-responsavel-"+task_id).html("{{ request.user.username }}");
+                    alert("Pronto!");
+                }else{
+                    usuario = retorno.split(":");
+                    if(usuario[1] != ""){
+                        $("#task-responsavel-"+task_id).html(usuario[1]);
+                    }
+                    alert(retorno);
+                }
+            }
+        })
+    }
+
+    function lancarHora(task_id){
+        // Display an external page using an iframe
+        $.modal("<div id='lancaHora-"+ task_id +"'>Quantas horas trabalhou <b>hoje</b>?: <input type=\"text\" id='qtd-horas-" + task_id + "'/><button onclick=\"javascript:enviarHora('" + task_id+ "')\" class=\"simplemodal-clise\">Salvar</button></div>",
+        {
+            overlayClose:true
+        });
+
+    }
+
+    function enviarHora(task_id){
+        var qtd_horas = $("#qtd-horas-"+task_id).val()
+        $.modal.close();
+        $.ajax({
+            url: "/lancarHora/",
+            type: "GET",
+            data: {
+                "task_id": task_id,
+                "sprint_id" : {{ sprint_id }},
+                "user_id" : {{ request.user.pk }},
+                "qtd-horas" : qtd_horas
+            },
+            success:function(retorno){
+                var tt = retorno.split(":")
+                $("#tt-wh-" + task_id).html(tt[1]);
+                alert(tt[0]);
+            }
+        });
+    }
+
+    function abrirComentarios(task_id){
+        // Display an external page using an iframe
+        var src = "/comentarios/?task_id="+task_id+"&user_id={{ request.user.pk }}&sprint_id={{ sprint_id }}";
+        $.modal('<iframe src="' + src + '" height="500" width="830" style="border:0">',
+        {
+            overlayClose:true
+        });
+
+    }
+
+</script>
+{% endblock %}
+</html>

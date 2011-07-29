@@ -1,0 +1,67 @@
+div {
+    display: block;
+}
+*{
+    font-size: 12px;
+    font-family: Arial;
+}
+td{
+    vertical-align: top;
+}
+
+.pontuacao{
+    border: 1px solid black;
+    float: right;
+    background-color: #FFF;
+    padding: 1.5px;
+}
+.corpo{
+    width: 100%;
+    background-color: #FFFFFF;
+}
+
+.corpo td{
+    background-color: #ebebeb;
+}
+
+.historias{
+    width: 10%;
+    text-align: center;
+}
+.status{
+    text-align: center;
+    width: 22%;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.off_links{
+    cursor: pointer;
+}
+
+.off_links img{
+    top: 3px;
+    position: relative;
+}
+
+.portlet { margin-left: 5%; margin-right: 5%; margin-bottom: 1em; }
+.portlet-header { margin: 0.3em; padding-bottom: 4px; padding-left: 0.2em; cursor: move;}
+.portlet-header .ui-icon { float: right; }
+.portlet-content { padding: 0.4em; }
+.ui-sortable-placeholder { border: 1px dotted black; visibility: visible !important; height: 50px !important; }
+.ui-sortable-placeholder * { visibility: hidden; }
+
+
+#simplemodal-overlay {background-color:#000;}
+#simplemodal-container {background-color:#FFF; border:8px solid #444; padding:12px;}
+#simplemodal-container a.modalCloseImg {
+    background:url(/media/img/x.png) no-repeat; /* adjust url as required */
+    width:25px;
+    height:29px;
+    display:inline;
+    z-index:3200;
+    position:absolute;
+    top:-15px;
+    right:-18px;
+    cursor:pointer;
+}
