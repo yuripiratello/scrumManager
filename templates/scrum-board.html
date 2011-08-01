@@ -22,15 +22,16 @@
                         x: -20 //center
                     },
                     subtitle: {
-                        text: 'Aaaaaa',
+                        text: 'Sprint {{ sprint_id }}',
                         x: -20
                     },
                     xAxis: {
-                        categories: {{ sprint_days }}
+                        categories: {{ sprint_days }},
+                        title: 'Dias'
                     },
                     yAxis: {
                         title: {
-                            text: 'Ligações'
+                            text: 'Peso'
                         },
                         plotLines: [{
                             value: 0,

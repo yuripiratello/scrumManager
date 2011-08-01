@@ -113,7 +113,7 @@ def scrumBoard(request):
             if sprint_tasks:
                 for sprint_task in sprint_tasks:
                     soma_weight = soma_weight - sprint_task.task.weight
-                    sprint_weights.append(int(soma_weight))
+                sprint_weights.append(int(soma_weight))
             else:
                 sprint_weights.append(int(soma_weight))
     return render_to_response('scrum-board.html', locals())
