@@ -108,10 +108,14 @@ class SprintAdmin(admin.ModelAdmin):
         formset.save_m2m()
 
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ['name','history','created_at','created_by']
+    list_display = ['name','history','created_at','completed_at','created_by']
     list_filter = ['created_at','created_by']
     search_fields = ['name','history__name','history__description','created_at','created_by']
     exclude = ['created_by']
+
+    def save_model(self, request, obj, form, change):
+        obj.created_by = request.user
+        obj.save()
 
 class WorkHourAdmin(admin.ModelAdmin):
     list_display = ['sprinttask','user','day','time']

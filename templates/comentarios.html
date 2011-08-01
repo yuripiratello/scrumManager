@@ -21,12 +21,17 @@ Comentarios - Sprint {{ sprint.name }} - Tarefa {{ task.name }}
         {% endif %}
     </ul>
 <form method="POST" action=".">{% csrf_token %}
-    {{ form.as_p }}
+    <p>
+        Comentário
+        <br/>
+        {{ form.comment.as_textarea }}
+        </p>
     <br />
     <input type="submit" value="Comentar">
-    <input type="hidden" name="sprint_id" value="{{ sprint_id }}">
-    <input type="hidden" name="task_id" value="{{ task_id }}">
-    <input type="hidden" name="user_id" value="{{ user_id }}">
-    <input type="hidden" name="sprinttask_id" value="{{ sprinttask_id }}">
+    <input type="hidden" name="sprint_idxxx" value="{{ sprint_id }}">
+    <input type="hidden" name="task_idxxx" value="{{ task_id }}">
+    <input type="hidden" name="user_idxxx" value="{{ user_id }}">
+    <input type="hidden" name="sprinttask_idxxx" value="{{ sprinttask_id }}">
+    <input type="hidden" name="sprinttaskxxx" value="{{ sprinttask_id }}">
 </form>
 {% endblock %}

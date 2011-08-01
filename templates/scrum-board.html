@@ -4,6 +4,78 @@
     Scrum Board
 {% endblock %}
 {% block body %}
+<div class="scrum-burndown close" id="scrum-burndown">
+    <div id="container">
+        <script type="text/javascript">
+            function geraGrafico(){
+                var chart;
+                $(document).ready(function() {
+                    chart = new Highcharts.Chart({
+                        chart: {
+                        renderTo: 'container',
+                        defaultSeriesType: 'line',
+                        marginRight: 130,
+                        marginBottom: 25
+                    },
+                    title: {
+                        text: 'Burndown ',
+                        x: -20 //center
+                    },
+                    subtitle: {
+                        text: 'Aaaaaa',
+                        x: -20
+                    },
+                    xAxis: {
+                        categories: {{ sprint_days }}
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Ligações'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }],
+                        labels: {
+                            formatter: function() {
+                                return this.value; // clean, unformatted number for year
+                            }
+                        }
+                    },
+                    tooltip: {
+                        formatter: function() {
+                            return '<b>'+ this.series.name +'</b><br/>'+
+                            this.x +': '+ this.y ;
+                        }
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'top',
+                        x: -10,
+                        y: 100,
+                        borderWidth: 0
+                    },
+                    series: [{
+                        name: "Atual",
+                        data: {{ sprint_weights }}
+                    }, {
+                        name: "Previsto",
+                        data: {{ sprint_tt_weight }}
+                    }]
+                });
+            });
+        }
+            geraGrafico();
+    </script>
+    {{ sprint_days }}
+    {{ sprint_weights }}
+    {{  sprint_tt_days }}
+    {{  sprint_tt_weight }}
+    </div>
+    <div class="call-burndown" onclick="javascript:abrirBurndown()">Gráfico de Burndown</div>
+</div>
 <table class="corpo" cellspacing="5px" >
     <tr>
         <td class="historias">História</td>
@@ -166,7 +238,13 @@
         });
 
     }
-
+    function abrirBurndown(){
+        if ($("#scrum-burndown").hasClass("close")){
+            $("#scrum-burndown").removeClass("close");
+        }else{
+            $("#scrum-burndown").addClass("close");
+        }
+    }
 </script>
 {% endblock %}
 </html>

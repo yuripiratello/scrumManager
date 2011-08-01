@@ -72,6 +72,7 @@ class Task(models.Model):
     weight = models.IntegerField(blank=True)
     estimate = models.CharField(max_length=3, choices=VALUES, default="?")
     status = models.CharField(max_length=1, choices=TASK_STATUS, default="1")
+    completed_at = models.DateTimeField(blank=True, null=True)
     created_by = models.ForeignKey(User, verbose_name="Created by", related_name="created_by")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created at")
 

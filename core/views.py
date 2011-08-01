@@ -11,7 +11,12 @@ from forms import *
 @login_required
 def scrumBoard(request):
     """
-        Estrutura do retorno:
+        Estruturas de retorno:
+
+        #####################################
+
+        Historias e suas respectivas tarefas do sprint selecionado.
+        -----------------------------------------------------------
         sprints_historias =
         {
             historia1 : {
@@ -29,6 +34,12 @@ def scrumBoard(request):
                 4:[],
             }
         }
+        ######################################
+
+        Grafico de burndown geral.
+        ----------------------------------
+        sprint_x = [1,2,3]
+        sprint_y = [1,2,3]
     """
     if "sprint_id" in request.GET:
         sprint_id = request.GET['sprint_id']
@@ -53,13 +64,67 @@ def scrumBoard(request):
                     task_sprint.task.work_hours = task_sprint.task.work_hours + wh.time
                 task_sprint.task.work_hours = int(task_sprint.task.work_hours)
                 historias[task_sprint.task.history][int(task_sprint.task.status)].append(task_sprint.task)
-    return render_to_response('scrum-board.html', {'request':request,'historias' : historias, 'sprint_id': sprint_id, })
+
+    sprint_tt_weight = []
+    sprint_tt_days = []
+
+    sprint_days = []
+    sprint_weights = []
+    sprint = Sprint.objects.get(pk=sprint_id)
+    if sprint:
+        sprint_tasks = SprintTask.objects.filter(sprint__pk=sprint_id)
+        dias = sprint.end_at - sprint.start_at
+        sprint_tt_days.append(int(dias.days))
+
+        if sprint_tasks:
+            tt = 0
+            for sprint_task in sprint_tasks:
+                tt = tt + sprint_task.task.weight
+
+        media = int(tt/dias.days)
+        for dia in range(0,dias.days+1):
+            last_media = (tt-(media*dia))
+            sprint_tt_days.append(int(dia))
+            sprint_tt_weight.append(int(last_media))
+        sprint_tt_weight[dias.days]=0
+
+        #Pegar quantidade finalizada do dia
+        inicio = sprint.start_at
+        soma_weight = int(sprint_tt_weight[0])
+        for day in range(0,dias.days+1):
+            #ADICIONA O DIA NA LISTA DO GRAFICO
+            dia = inicio + datetime.timedelta(days=day)
+            #if dia <= datetime.date.today():
+            sprint_days.append(int(day))
+            date_ini = datetime.datetime(dia.year, dia.month, dia.day,0,0,0)
+            date_fim = datetime.datetime(dia.year, dia.month, dia.day,23,59,59)
+
+            sprint_tasks = SprintTask.objects.filter(
+                                sprint__pk=sprint_id,
+                                task__in=(
+                                    Task.objects.filter(
+                                        completed_at__range=(
+                                            date_ini,
+                                            date_fim
+                                        )
+                                    )
+                                )
+                            )
+            if sprint_tasks:
+                for sprint_task in sprint_tasks:
+                    soma_weight = soma_weight - sprint_task.task.weight
+                    sprint_weights.append(int(soma_weight))
+            else:
+                sprint_weights.append(int(soma_weight))
+    return render_to_response('scrum-board.html', locals())
 
 def updateTaskStatus(request):
     resultado = "fail"
     if "task_id" in request.GET and "new_status" in request.GET:
         task = Task.objects.get(pk=request.GET['task_id'])
         task.status = request.GET['new_status']
+        if int(request.GET['new_status']) == 4:
+            task.completed_at = datetime.datetime.now()
         task.save()
         resultado = "ok"
     else:
@@ -96,8 +161,6 @@ def lancarHora(request):
     retorno = "Falhou"
     if "task_id" in request.GET and "user_id" in request.GET and "sprint_id" in request.GET and "qtd-horas" in request.GET:
         st = SprintTask.objects.filter(task__pk=request.GET['task_id'], sprint__pk=request.GET['sprint_id'])[0]
-        print "ST ID ASSOCIATED_TO: " + str(st.associated_to_id)
-        print "USER ID: " + str(request.GET['user_id'])
         if str(st.associated_to_id) == str(request.GET['user_id']):
             user = User.objects.get(pk=request.GET['user_id'])
             wh = WorkHour()
@@ -121,18 +184,26 @@ def lancarHora(request):
 def comentarios(request):
     if request.method == 'POST':
         #####################################
-        user_id = request.POST['user_id']
-        task_id = request.POST['task_id']
-        sprint_id = request.POST['sprint_id']
+        user_id = request.POST['user_idxxx']
+        task_id = request.POST['task_idxxx']
+        sprint_id = request.POST['sprint_idxxx']
         sprinttask = SprintTask.objects.filter(sprint__id=sprint_id, task__id=task_id)[0]
         sprinttask_id = sprinttask.pk
+        new_request_POST = request.POST.copy()
+        if not "sprinttask" in new_request_POST:
+            new_request_POST['sprinttask'] = sprinttask_id
+        else:
+            new_request_POST['sprinttask'] = sprinttask_id
+        if not "created_by" in new_request_POST:
+            new_request_POST['created_by'] = user_id
+        else:
+            new_request_POST['created_by'] = user_id
         #####################################
         user = User.objects.get(pk = user_id)
-        form = CommentForm(request.POST)
+        form = CommentForm(new_request_POST)
         if form.is_valid():
             form.save()
             form = CommentForm()
-
     else:
         #####################################
         task_id = request.GET['task_id']
