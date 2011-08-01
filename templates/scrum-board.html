@@ -12,62 +12,62 @@
                 $(document).ready(function() {
                     chart = new Highcharts.Chart({
                         chart: {
-                        renderTo: 'container',
-                        defaultSeriesType: 'line',
-                        marginRight: 130,
-                        marginBottom: 25
-                    },
-                    title: {
-                        text: 'Burndown ',
-                        x: -20 //center
-                    },
-                    subtitle: {
-                        text: 'Sprint {{ sprint_id }}',
-                        x: -20
-                    },
-                    xAxis: {
-                        categories: {{ sprint_days }},
-                        title: 'Dias'
-                    },
-                    yAxis: {
-                        title: {
-                            text: 'Peso'
+                            renderTo: 'container',
+                            defaultSeriesType: 'line',
+                            marginRight: 130,
+                            marginBottom: 25
                         },
-                        plotLines: [{
-                            value: 0,
-                            width: 1,
-                            color: '#808080'
-                        }],
-                        labels: {
-                            formatter: function() {
-                                return this.value; // clean, unformatted number for year
+                        title: {
+                            text: 'Burndown ',
+                            x: -20 //center
+                        },
+                        subtitle: {
+                            text: 'Sprint {{ sprint_id }}',
+                            x: -20
+                        },
+                        xAxis: {
+                            categories: {{ sprint_days }},
+                            title: 'Dias'
+                        },
+                        yAxis: {
+                            title: {
+                                text: 'Peso'
+                            },
+                            plotLines: [{
+                                value: 0,
+                                width: 1,
+                                color: '#808080'
+                            }],
+                            labels: {
+                                formatter: function() {
+                                    return this.value; // clean, unformatted number for year
+                                }
                             }
-                        }
-                    },
-                    tooltip: {
-                        formatter: function() {
-                            return '<b>'+ this.series.name +'</b><br/>'+
-                            this.x +': '+ this.y ;
-                        }
-                    },
-                    legend: {
-                        layout: 'vertical',
-                        align: 'right',
-                        verticalAlign: 'top',
-                        x: -10,
-                        y: 100,
-                        borderWidth: 0
-                    },
-                    series: [{
-                        name: "Atual",
-                        data: {{ sprint_weights }}
-                    }, {
-                        name: "Previsto",
-                        data: {{ sprint_tt_weight }}
-                    }]
+                        },
+                        tooltip: {
+                            formatter: function() {
+                                return '<b>'+ this.series.name +'</b><br/>'+
+                                this.x +': '+ this.y ;
+                            }
+                        },
+                        legend: {
+                            layout: 'vertical',
+                            align: 'right',
+                            verticalAlign: 'top',
+                            x: -10,
+                            y: 100,
+                            borderWidth: 0
+                        },
+                        series: [{
+                            name: "Atual",
+                            data: {{ sprint_weights }}
+                        }, {
+                            name: "Previsto",
+                            data: {{ sprint_tt_weight }}
+                        }]
+                    });
                 });
-            });
-        }
+            }
             geraGrafico();
     </script>
     {{ sprint_days }}
