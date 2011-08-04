@@ -4,6 +4,12 @@
     Scrum Board
 {% endblock %}
 {% block body %}
+<b>Sprint:</b> {{ sprint }} <br />
+<b>Criado em:</b> {{ sprint.created_at }}<br />
+<b>Inicio em:</b> {{ sprint.start_at }}<br />
+<b>Termino em:</b> {{ sprint.end_at }}<br />
+<b>Criado por:</b> {{ sprint.created_by }}<br />
+<hr />
 <div class="scrum-burndown close" id="scrum-burndown">
     <div id="container">
         <script type="text/javascript">
@@ -70,12 +76,8 @@
             }
             geraGrafico();
     </script>
-    {{ sprint_days }}
-    {{ sprint_weights }}
-    {{  sprint_tt_days }}
-    {{  sprint_tt_weight }}
     </div>
-    <div class="call-burndown" onclick="javascript:abrirBurndown()">Gráfico de Burndown</div>
+    <div class="call-burndown" onclick="javascript:abrirBurndown()">Clique aqui -> Gráfico de Burndown <- Clique aqui</div>
 </div>
 <table class="corpo" cellspacing="5px" >
     <tr>
@@ -117,6 +119,8 @@
                                 <b>Comentários:</b> {{ task.comments }} <span class="off_links" onclick="javascript:abrirComentarios('{{ task.pk }}');"> <img src="/media/img/plus.gif" width="16px" height="16px" /></span>
                                 <br />
                                 <b>Lançar Horas:</b> <span id="tt-wh-{{ task.pk }}">{{ task.work_hours }}</span> <span class="off_links" onclick="javascript:lancarHora('{{ task.pk }}')"> <img src="/media/img/plus.gif" width="16px" height="16px" /></span>
+                                <br />
+                                <b>Concluida em:</b> {{ task.completed_at }}
                             </div>
                         </div>
                     {% endfor %}

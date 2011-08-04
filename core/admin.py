@@ -1,15 +1,17 @@
+from django.contrib.sites.models import Site
+
 __author__ = 'yuri'
 
 from django.contrib import admin
 from models import *
 
-class Backloginlines(admin.TabularInline):
-    model = Backlog
+class Projectinlines(admin.TabularInline):
+    model = Project
     extra = 0
     exclude = ['created_by']
 
 class OrganizationAdmin(admin.ModelAdmin):
-    inlines = [Backloginlines,]
+    inlines = [Projectinlines,]
     list_display = ['name','created_by','created_at',]
     list_filter = ['name','created_by','created_at',]
     search_fields = ['name','created_by','created_at',]
@@ -32,7 +34,7 @@ class Historyinlines(admin.TabularInline):
     extra = 0
     exclude = ['created_by']
 
-class BacklogAdmin(admin.ModelAdmin):
+class ProjectAdmin(admin.ModelAdmin):
     inlines = [Historyinlines,]
     list_display = ['name','organization','created_by','created_at',]
     list_filter = ['name','organization','created_by','created_at',]
@@ -57,7 +59,8 @@ class Taskinlines(admin.TabularInline):
 
 class HistoryAdmin(admin.ModelAdmin):
     inlines = [Taskinlines,]
-    list_display = ['name','backlog','weight','estimate','created_by','created_at',]
+    list_display = ['name','project','weight','estimate','created_by','created_at',]
+    list_filter = ['project','created_by','created_at',]
     exclude = ['created_by']
 
     def save_model(self, request, obj, form, change):
@@ -129,10 +132,10 @@ class WorkHourAdmin(admin.ModelAdmin):
         obj.save()
 
 admin.site.register(Organization, OrganizationAdmin)
-admin.site.register(Backlog, BacklogAdmin)
+admin.site.register(Project, ProjectAdmin)
 admin.site.register(History, HistoryAdmin)
 admin.site.register(Task, TaskAdmin)
 admin.site.register(Sprint, SprintAdmin)
-admin.site.register(SprintTask)
+#admin.site.register(SprintTask)
 admin.site.register(WorkHour, WorkHourAdmin)
-#admin.site.register(SprintTaskComment)
+admin.site.unregister(Site)

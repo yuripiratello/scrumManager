@@ -65,57 +65,60 @@ def scrumBoard(request):
                 task_sprint.task.work_hours = int(task_sprint.task.work_hours)
                 historias[task_sprint.task.history][int(task_sprint.task.status)].append(task_sprint.task)
 
-    sprint_tt_weight = []
-    sprint_tt_days = []
+        sprint_tt_weight = []
+        sprint_tt_days = []
 
-    sprint_days = []
-    sprint_weights = []
-    sprint = Sprint.objects.get(pk=sprint_id)
-    if sprint:
-        sprint_tasks = SprintTask.objects.filter(sprint__pk=sprint_id)
-        dias = sprint.end_at - sprint.start_at
-        sprint_tt_days.append(int(dias.days))
+        sprint_days = []
+        sprint_weights = []
+        sprint = Sprint.objects.get(pk=sprint_id)
+        if sprint:
+            sprint_tasks = SprintTask.objects.filter(sprint__pk=sprint_id)
+            dias = sprint.end_at - sprint.start_at
+            sprint_tt_days.append(int(dias.days))
 
-        if sprint_tasks:
-            tt = 0
-            for sprint_task in sprint_tasks:
-                tt = tt + sprint_task.task.weight
+            if sprint_tasks:
+                tt = 0
+                for sprint_task in sprint_tasks:
+                    tt = tt + sprint_task.task.weight
 
-        media = int(tt/dias.days)
-        for dia in range(0,dias.days+1):
-            last_media = (tt-(media*dia))
-            sprint_tt_days.append(int(dia))
-            sprint_tt_weight.append(int(last_media))
-        sprint_tt_weight[dias.days]=0
+            media = int(tt/dias.days)
+            for dia in range(0,dias.days+1):
+                last_media = (tt-(media*dia))
+                sprint_tt_days.append(int(dia))
+                sprint_tt_weight.append(int(last_media))
+            sprint_tt_weight[dias.days]=0
 
-        #Pegar quantidade finalizada do dia
-        inicio = sprint.start_at
-        soma_weight = int(sprint_tt_weight[0])
-        for day in range(0,dias.days+1):
-            #ADICIONA O DIA NA LISTA DO GRAFICO
-            dia = inicio + datetime.timedelta(days=day)
-            #if dia <= datetime.date.today():
-            sprint_days.append(int(day))
-            date_ini = datetime.datetime(dia.year, dia.month, dia.day,0,0,0)
-            date_fim = datetime.datetime(dia.year, dia.month, dia.day,23,59,59)
+            #Pegar quantidade finalizada do dia
+            inicio = sprint.start_at
+            soma_weight = int(sprint_tt_weight[0])
+            for day in range(0,dias.days+1):
+                #ADICIONA O DIA NA LISTA DO GRAFICO
+                dia = inicio + datetime.timedelta(days=day)
+                #if dia <= datetime.date.today():
+                sprint_days.append(int(day))
+                date_ini = datetime.datetime(dia.year, dia.month, dia.day,0,0,0)
+                date_fim = datetime.datetime(dia.year, dia.month, dia.day,23,59,59)
 
-            sprint_tasks = SprintTask.objects.filter(
-                                sprint__pk=sprint_id,
-                                task__in=(
-                                    Task.objects.filter(
-                                        completed_at__range=(
-                                            date_ini,
-                                            date_fim
+                sprint_tasks = SprintTask.objects.filter(
+                                    sprint__pk=sprint_id,
+                                    task__in=(
+                                        Task.objects.filter(
+                                            completed_at__range=(
+                                                date_ini,
+                                                date_fim
+                                            )
                                         )
                                     )
                                 )
-                            )
-            if sprint_tasks:
-                for sprint_task in sprint_tasks:
-                    soma_weight = soma_weight - sprint_task.task.weight
-                sprint_weights.append(int(soma_weight))
-            else:
-                sprint_weights.append(int(soma_weight))
+                if sprint_tasks:
+                    for sprint_task in sprint_tasks:
+                        soma_weight = soma_weight - sprint_task.task.weight
+                    sprint_weights.append(int(soma_weight))
+                else:
+                    sprint_weights.append(int(soma_weight))
+    else:
+        sprints = Sprint.objects.all()
+        return render_to_response('inicio.html', locals())
     return render_to_response('scrum-board.html', locals())
 
 def updateTaskStatus(request):
@@ -125,6 +128,8 @@ def updateTaskStatus(request):
         task.status = request.GET['new_status']
         if int(request.GET['new_status']) == 4:
             task.completed_at = datetime.datetime.now()
+        else:
+            task.completed_at = None
         task.save()
         resultado = "ok"
     else:
@@ -148,7 +153,7 @@ def updateTaskSprintResponsible(request):
                 sprinttask.save()
                 resultado = "ok"
         else:
-            resultado = "Voce nao possui permissao."
+            resultado = "Voce nao possui permissao, voce deve pertencer ao Grupo 'Team'."
     else:
         resultado = "Faltam parametros"
     return HttpResponse(resultado)

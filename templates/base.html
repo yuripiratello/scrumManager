@@ -12,7 +12,7 @@
 	<script src="/media/js/ui/jquery.ui.mouse.js"></script>
 	<script src="/media/js/ui/jquery.ui.draggable.js"></script>
     <script src="/media/js/jquery.simplemodal-1.4.1.js"></script>
-    <script type="text/javascript" src="/media/js/highcharts.src.js"></script>
+    <script type="text/javascript" src="/media/js/highcharts.js"></script>
     <script type="text/javascript" src="/media/js/exporting.js"></script>
     <script type="text/javascript" src="/media/js/ui/jquery.ui.sortable.js"></script>
     <link rel="stylesheet" href="/media/js/themes/base/jquery.ui.all.css" type="text/css" media="all" />
@@ -20,9 +20,13 @@
     {% block script_add %}{% endblock %}
 </head>
 <body>
-{# <ul> #}
-{#     <li><a href="/admin/">Admin</a></li> #}
-{# </ul> #}
+{% block top %}
+Olá, {{ request.user }} <<a href="/logout/">Sair</a>>,<br />
+Menu
+<ul>
+    <li><a href="/admin/">Interface Administrativa</a></li>
+</ul>
+{% endblock %}
 {% block body %}
 {% endblock %}
 </body>

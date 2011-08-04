@@ -36,30 +36,38 @@ class Organization(models.Model):
     name = models.CharField(max_length=100)
     created_by = models.ForeignKey(User, verbose_name="Created by")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created at")
+    
+    class Meta:
+        verbose_name = 'Organizacao'
+        verbose_name_plural = 'Organizacoes'
 
     def __unicode__(self):
         return self.name
 
-class Backlog(models.Model):
+class Project(models.Model):
     organization = models.ForeignKey(Organization, null=True)
     name = models.CharField(max_length=100, verbose_name="Project")
     created_by = models.ForeignKey(User, verbose_name="Created by")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created at")
 
+    class Meta:
+        verbose_name = 'Projeto'
+        verbose_name_plural = 'Projetos'
+
     def __unicode__(self):
         return self.name
 
-    class Meta:
-        verbose_name = "Backlog (Produto)"
-        verbose_name_plural = "Backlogs (Produtos)"
-
 class History(models.Model):
-    backlog = models.ForeignKey(Backlog)
+    project = models.ForeignKey(Project)
     name = models.CharField(max_length=100)
-    weight = models.IntegerField(blank=True, default=0)
+    weight = models.IntegerField(blank=True, default=0, help_text='Peso da Historia dentro do Projeto para o Product Owner')
     description = models.TextField()
     created_by = models.ForeignKey(User, verbose_name="Created by")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created at")
+
+    class Meta:
+        verbose_name = 'Historia'
+        verbose_name_plural = 'Historias'
 
     def __unicode__(self):
         return self.name
@@ -69,17 +77,22 @@ class Task(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     type = models.CharField(max_length=1, choices=TASK_TYPE, default="F")
-    weight = models.IntegerField(blank=True)
+    weight = models.IntegerField(blank=True,help_text='Peso da Tarefa dentro da historia para o Team')
     estimate = models.CharField(max_length=3, choices=VALUES, default="?")
     status = models.CharField(max_length=1, choices=TASK_STATUS, default="1")
     completed_at = models.DateTimeField(blank=True, null=True)
     created_by = models.ForeignKey(User, verbose_name="Created by", related_name="created_by")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created at")
+    
+    class Meta:
+        verbose_name = 'Tarefa'
+        verbose_name_plural = 'Tarefas'
 
     def __unicode__(self):
-        return self.name
+        return "%s (%s - %s)" % (self.name, self.history, self.history.project)
 
 class Sprint(models.Model):
+    project = models.ForeignKey(Project)
     name = models.CharField(max_length=100)
     start_at = models.DateField(verbose_name="Start at", null=True, default=datetime.datetime.now())
     end_at = models.DateField(verbose_name="End at", blank=True, default=(datetime.datetime.now() + datetime.timedelta(days=15)))
@@ -111,3 +124,7 @@ class WorkHour(models.Model):
     day = models.DateField(default=datetime.date.today())
     time = models.FloatField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Horas de Trabalho'
+        verbose_name_plural = 'Horas de Trabalho'
