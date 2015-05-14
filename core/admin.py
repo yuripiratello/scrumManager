@@ -59,9 +59,10 @@ class Taskinlines(admin.TabularInline):
 
 class HistoryAdmin(admin.ModelAdmin):
     inlines = [Taskinlines,]
-    list_display = ['name','project','weight','estimate','created_by','created_at',]
-    list_filter = ['project','created_by','created_at',]
+    list_display = ['name','project', 'sprint','weight','priority','estimate','created_by','created_at',]
+    list_filter = ['project','created_by','created_at','sprint']
     exclude = ['created_by']
+    ordering = ['sprint','priority']
 
     def save_model(self, request, obj, form, change):
         obj.created_by = request.user
@@ -87,14 +88,14 @@ class HistoryAdmin(admin.ModelAdmin):
         return total
     estimate.short_description = "Estimate"
 
-class SprintTaskInLine(admin.TabularInline):
-    model = SprintTask
-    extra = 0
-    exclude = ['created_by']
+# class SprintTaskInLine(admin.TabularInline):
+#     model = SprintTask
+#     extra = 0
+#     exclude = ['created_by']
 
 
 class SprintAdmin(admin.ModelAdmin):
-    inlines = [SprintTaskInLine,]
+    # inlines = [SprintTaskInLine,]
     list_display = ['name','created_at','end_at','created_by']
     list_filter = ['created_at','end_at','created_by']
     exclude = ['created_by']
@@ -121,9 +122,9 @@ class TaskAdmin(admin.ModelAdmin):
         obj.save()
 
 class WorkHourAdmin(admin.ModelAdmin):
-    list_display = ['sprinttask','user','day','time']
+    list_display = ['task','user','day','time']
     list_filter = ['user','day']
-    search_fields = ['name','history__name','history__description','created_at','created_by']
+    search_fields = ['name','task__history__name','task__history__description','created_at','created_by']
     date_hierarchy = 'day'
     exclude = ['user']
 

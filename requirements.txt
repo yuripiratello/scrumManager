@@ -1,0 +1,4 @@
+Django==1.2.5
+argparse==1.2.1
+django-admin-tools==0.5.2
+wsgiref==0.1.2

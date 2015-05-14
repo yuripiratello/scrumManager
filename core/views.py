@@ -44,26 +44,27 @@ def scrumBoard(request):
     if "sprint_id" in request.GET:
         sprint_id = request.GET['sprint_id']
         historias = {}
-        sprint_tasks = SprintTask.objects.filter(sprint__pk=sprint_id)
-        if sprint_tasks:
-            for task_sprint in sprint_tasks:
-                if not task_sprint.task.history in historias:
-                    historias[task_sprint.task.history] = {}
-                if not 1 in historias[task_sprint.task.history]:
-                    historias[task_sprint.task.history][1] = []
-                if not 2 in historias[task_sprint.task.history]:
-                    historias[task_sprint.task.history][2] = []
-                if not 3 in historias[task_sprint.task.history]:
-                    historias[task_sprint.task.history][3] = []
-                if not 4 in historias[task_sprint.task.history]:
-                    historias[task_sprint.task.history][4] = []
-                task_sprint.task.resp = task_sprint.associated_to
-                task_sprint.task.comments = len(task_sprint.sprinttaskcomment_set.all())
-                task_sprint.task.work_hours = 0
-                for wh in task_sprint.workhour_set.all():
-                    task_sprint.task.work_hours = task_sprint.task.work_hours + wh.time
-                task_sprint.task.work_hours = int(task_sprint.task.work_hours)
-                historias[task_sprint.task.history][int(task_sprint.task.status)].append(task_sprint.task)
+        sprint_histories = History.objects.filter(sprint__pk=sprint_id).order_by('priority')
+        if sprint_histories:
+            for history_sprint in sprint_histories:
+                if not history_sprint in historias:
+                    historias[history_sprint] = {}
+                if not 1 in historias[history_sprint]:
+                    historias[history_sprint][1] = []
+                if not 2 in historias[history_sprint]:
+                    historias[history_sprint][2] = []
+                if not 3 in historias[history_sprint]:
+                    historias[history_sprint][3] = []
+                if not 4 in historias[history_sprint]:
+                    historias[history_sprint][4] = []
+                for task in history_sprint.task_set.all():
+                    task.resp = task.associated_to
+                    task.comments = len(task.taskcomment_set.all())
+                    task.work_hours = 0
+                    for wh in task.workhour_set.all():
+                        task.work_hours = task.work_hours + wh.time
+                    task.work_hours = int(task.work_hours)
+                    historias[history_sprint][int(task.status)].append(task)
 
         sprint_tt_weight = []
         sprint_tt_days = []
@@ -72,14 +73,14 @@ def scrumBoard(request):
         sprint_weights = []
         sprint = Sprint.objects.get(pk=sprint_id)
         if sprint:
-            sprint_tasks = SprintTask.objects.filter(sprint__pk=sprint_id)
+            sprint_tasks = Task.objects.filter(history__sprint__pk=sprint_id)
             dias = sprint.end_at - sprint.start_at
             sprint_tt_days.append(int(dias.days))
 
             if sprint_tasks:
                 tt = 0
                 for sprint_task in sprint_tasks:
-                    tt = tt + sprint_task.task.weight
+                    tt = tt + sprint_task.weight
 
             media = int(tt/dias.days)
             for dia in range(0,dias.days+1):
@@ -99,20 +100,16 @@ def scrumBoard(request):
                 date_ini = datetime.datetime(dia.year, dia.month, dia.day,0,0,0)
                 date_fim = datetime.datetime(dia.year, dia.month, dia.day,23,59,59)
 
-                sprint_tasks = SprintTask.objects.filter(
-                                    sprint__pk=sprint_id,
-                                    task__in=(
-                                        Task.objects.filter(
-                                            completed_at__range=(
-                                                date_ini,
-                                                date_fim
-                                            )
-                                        )
+                sprint_tasks = Task.objects.filter(
+                                    history__sprint__pk=sprint_id,
+                                    completed_at__range=(
+                                        date_ini,
+                                        date_fim
                                     )
                                 )
                 if sprint_tasks:
                     for sprint_task in sprint_tasks:
-                        soma_weight = soma_weight - sprint_task.task.weight
+                        soma_weight = soma_weight - sprint_task.weight
                     sprint_weights.append(int(soma_weight))
                 else:
                     sprint_weights.append(int(soma_weight))
@@ -145,7 +142,7 @@ def updateTaskSprintResponsible(request):
         user = User.objects.get(pk = request.GET['user_id'])
         team = Group.objects.get(name="Team")
         if team in user.groups.all():
-            sprinttask = SprintTask.objects.get(task__pk=request.GET['task_id'], sprint__pk=request.GET['sprint_id'])
+            sprinttask = Task.objects.get(pk=request.GET['task_id'])
             if sprinttask.associated_to:
                 resultado = "Essa tarefa ja possui um responsavel: " + sprinttask.associated_to.username
             else:
@@ -160,16 +157,16 @@ def updateTaskSprintResponsible(request):
 
 def index(request):
     sprints = Sprint.objects.all()
-    return render_to_response('index.html', local())
+    return render_to_response('index.html', locals())
 
 def lancarHora(request):
     retorno = "Falhou"
-    if "task_id" in request.GET and "user_id" in request.GET and "sprint_id" in request.GET and "qtd-horas" in request.GET:
-        st = SprintTask.objects.filter(task__pk=request.GET['task_id'], sprint__pk=request.GET['sprint_id'])[0]
+    if "task_id" in request.GET and "user_id" in request.GET and "qtd-horas" in request.GET:
+        st = Task.objects.filter(task__pk=request.GET['task_id'])[0]
         if str(st.associated_to_id) == str(request.GET['user_id']):
             user = User.objects.get(pk=request.GET['user_id'])
             wh = WorkHour()
-            wh.sprinttask = st
+            wh.task = st
             wh.day = datetime.date.today()
             wh.user = user
             wh.time = int(request.GET['qtd-horas'])
@@ -192,13 +189,13 @@ def comentarios(request):
         user_id = request.POST['user_idxxx']
         task_id = request.POST['task_idxxx']
         sprint_id = request.POST['sprint_idxxx']
-        sprinttask = SprintTask.objects.filter(sprint__id=sprint_id, task__id=task_id)[0]
-        sprinttask_id = sprinttask.pk
+        task = Task.objects.filter(task__id=task_id)[0]
+        task_id = task.pk
         new_request_POST = request.POST.copy()
         if not "sprinttask" in new_request_POST:
-            new_request_POST['sprinttask'] = sprinttask_id
+            new_request_POST['sprinttask'] = task_id
         else:
-            new_request_POST['sprinttask'] = sprinttask_id
+            new_request_POST['sprinttask'] = task_id
         if not "created_by" in new_request_POST:
             new_request_POST['created_by'] = user_id
         else:
@@ -214,10 +211,10 @@ def comentarios(request):
         task_id = request.GET['task_id']
         sprint_id = request.GET['sprint_id']
         user_id = request.GET['user_id']
-        sprinttask = SprintTask.objects.filter(sprint__id=sprint_id, task__id=task_id)
+        sprinttask = Task.objects.filter(task__id=task_id)
         sprinttask_id = sprinttask[0].pk
         #####################################
         form = CommentForm()
     #########################################
-    comments = SprintTaskComment.objects.filter(sprinttask__id=sprinttask_id)
+    comments = TaskComment.objects.filter(task__id=task_id)
     return render_to_response('comentarios.html', {'form':form,'task_id':task_id,'user_id':user_id,'sprint_id':sprint_id,'sprinttask_id':sprinttask_id,'comments':comments,},context_instance=RequestContext(request))
