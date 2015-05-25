@@ -129,8 +129,8 @@
                               <ul class="cards">
                                 <li><b>Tipo:</b> {{ task.type }}</li>
                                 <li><b>Responsável:</b> <span id="task-responsavel-{{ task.pk }}">{% if task.resp %}{{ task.resp }}{% else %}Ninguém (<span style="color: red;" onclick="javascript:pegarTask('{{ task.id }}')">Pegar</span>){% endif %}</span></li>
-                                <li><b>Comentários:</b> {{ task.comments }} <span class="off_links" onclick="javascript:abrirComentarios('{{ task.pk }}');">+<!--img src="/media/img/plus.gif" width="16px" height="16px" /--></span></li>
-                                <li><b>Lançar Horas:</b> <span id="tt-wh-{{ task.pk }}">{{ task.work_hours }}</span> <span class="off_links" onclick="javascript:lancarHora('{{ task.pk }}')">+ <!--img src="/media/img/plus.gif" width="16px" height="16px" /--></span></li>
+                                <li><b>Comentários:</b> {{ task.comments }} <span class="off_links" onclick="javascript:abrirComentarios('{{ task.pk }}');">+<!--img src="/static/img/plus.gif" width="16px" height="16px" /--></span></li>
+                                <li><b>Lançar Horas:</b> <span id="tt-wh-{{ task.pk }}">{{ task.work_hours }}</span> <span class="off_links" onclick="javascript:lancarHora('{{ task.pk }}')">+ <!--img src="/static/img/plus.gif" width="16px" height="16px" /--></span></li>
                                 <li><b>Concluida em:</b> {{ task.completed_at }}</li>
                               </ul>
                             </div>

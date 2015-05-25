@@ -1,4 +1,4 @@
-"""xxxxxx URL Configuration
+"""scrumManager URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/1.8/topics/http/urls/
@@ -15,23 +15,19 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-import settings
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    (r'^admin/', include(admin.site.urls)),
-    (r'^$', 'core.views.scrumBoard'),
+    url(r'^$', 'core.views.scrumBoard'),
 
+    url(r'^changeTaskStatus/', 'core.views.updateTaskStatus'),
+    url(r'^pegarTask/', 'core.views.updateTaskSprintResponsible'),
 
-    (r'^changeTaskStatus/', 'core.views.updateTaskStatus'),
-    (r'^pegarTask/', 'core.views.updateTaskSprintResponsible'),
-
-    (r'^lancarHora/', 'core.views.lancarHora'),
-    (r'^comentarios/', 'core.views.comentarios'),
+    url(r'^lancarHora/', 'core.views.lancarHora'),
+    url(r'^comentarios/', 'core.views.comentarios'),
 
     url(r'^login/$',  'django.contrib.auth.views.login', {'template_name' : 'login.html'}),
     url(r'^logout/$', 'django.contrib.auth.views.logout_then_login', {'login_url' : '/login/'}, name='logout'),
-
-    url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
-               {'document_root' : settings.MEDIA_ROOT})
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
