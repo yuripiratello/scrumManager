@@ -14,7 +14,6 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     (r'^admin/', include(admin.site.urls)),
     (r'^$', 'core.views.scrumBoard'),
-    url(r'^admin_tools/', include('admin_tools.urls')),
 
 
     (r'^changeTaskStatus/', 'core.views.updateTaskStatus'),

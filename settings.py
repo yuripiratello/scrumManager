@@ -102,10 +102,6 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
-    #'admin_tools',
-    #'admin_tools.theming',
-    #'admin_tools.menu',
-    #'admin_tools.dashboard',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -123,4 +119,3 @@ INSTALLED_APPS = (
 LOGIN_URL = "/login/"
 LOGOUT_URL = "/logout/"
 LOGIN_REDIRECT_URL = "/"
-ADMIN_TOOLS_INDEX_DASHBOARD = 'scrumManager.dashboard.CustomIndexDashboard'
