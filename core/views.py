@@ -41,6 +41,7 @@ def scrumBoard(request):
         sprint_x = [1,2,3]
         sprint_y = [1,2,3]
     """
+    sprints = Sprint.objects.all()
     if "sprint_id" in request.GET:
         sprint_id = request.GET['sprint_id']
         historias = {}
@@ -77,8 +78,8 @@ def scrumBoard(request):
             dias = sprint.end_at - sprint.start_at
             sprint_tt_days.append(int(dias.days))
 
+            tt = 0
             if sprint_tasks:
-                tt = 0
                 for sprint_task in sprint_tasks:
                     tt = tt + sprint_task.weight
 
