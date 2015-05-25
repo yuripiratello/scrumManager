@@ -89,7 +89,7 @@ class Task(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created at")
 
     associated_to = models.ForeignKey(User, verbose_name="Associated to", null=True, related_name="associated_to", blank=True)
-    associated_at = models.DateTimeField(auto_now_add=True, default=datetime.datetime.now(), verbose_name="Associated at")
+    associated_at = models.DateTimeField(auto_now_add=True, verbose_name="Associated at")
     
     class Meta:
         verbose_name = 'Tarefa'
@@ -123,7 +123,7 @@ class TaskComment(models.Model):
     task = models.ForeignKey(Task)
     created_by = models.ForeignKey(User)
     comment = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True, default=datetime.datetime.now(), verbose_name="Created at")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created at")
 
 class WorkHour(models.Model):
     user = models.ForeignKey(User)
