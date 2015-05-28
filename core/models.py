@@ -1,3 +1,4 @@
+# -*- coding: utf8
 from django.contrib.auth.models import User
 from django.db import models
 import datetime
@@ -59,8 +60,10 @@ class Project(models.Model):
 
 class History(models.Model):
     project = models.ForeignKey(Project)
+    sprint = models.ForeignKey('Sprint', null=True, blank=True)
     name = models.CharField(max_length=100)
-    weight = models.IntegerField(blank=True, default=0, help_text='Peso da Historia dentro do Projeto para o Product Owner')
+    weight = models.IntegerField(null=True, blank=True, default=0, help_text='Peso da Historia dentro do Projeto para o Product Owner')
+    priority = models.IntegerField(null=True, blank=True, default=0, help_text='Prioridade da história.')
     description = models.TextField()
     created_by = models.ForeignKey(User, verbose_name="Created by")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created at")
@@ -77,12 +80,16 @@ class Task(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     type = models.CharField(max_length=1, choices=TASK_TYPE, default="F")
-    weight = models.IntegerField(blank=True,help_text='Peso da Tarefa dentro da historia para o Team')
+    weight = models.IntegerField(null=True, blank=True,help_text='Peso da Tarefa dentro da historia para o Team')
+    priority = models.IntegerField(null=True, blank=True, default=0, help_text='Prioridade da tarefa.')
     estimate = models.CharField(max_length=3, choices=VALUES, default="?")
     status = models.CharField(max_length=1, choices=TASK_STATUS, default="1")
     completed_at = models.DateTimeField(blank=True, null=True)
     created_by = models.ForeignKey(User, verbose_name="Created by", related_name="created_by")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created at")
+
+    associated_to = models.ForeignKey(User, verbose_name="Associated to", null=True, related_name="associated_to", blank=True)
+    associated_at = models.DateTimeField(auto_now_add=True, verbose_name="Associated at")
     
     class Meta:
         verbose_name = 'Tarefa'
@@ -102,25 +109,25 @@ class Sprint(models.Model):
     def __unicode__(self):
         return self.name
 
-class SprintTask(models.Model):
-    sprint = models.ForeignKey(Sprint)
+# class SprintTask(models.Model):
+#     sprint = models.ForeignKey(Sprint)
+#     task = models.ForeignKey(Task)
+#     associated_to = models.ForeignKey(User, verbose_name="Associated to", null=True, related_name="associated_to", blank=True)
+#     associated_at = models.DateTimeField(auto_now_add=True, default=datetime.datetime.now(), verbose_name="Associated at")
+#     created_by = models.ForeignKey(User, verbose_name="Created by", null=True)
+#
+#     def __unicode__(self):
+#         return self.sprint.name + " - " + self.task.name
+
+class TaskComment(models.Model):
     task = models.ForeignKey(Task)
-    associated_to = models.ForeignKey(User, verbose_name="Associated to", null=True, related_name="associated_to", blank=True)
-    associated_at = models.DateTimeField(auto_now_add=True, default=datetime.datetime.now(), verbose_name="Associated at")
-    created_by = models.ForeignKey(User, verbose_name="Created by", null=True)
-
-    def __unicode__(self):
-        return self.sprint.name + " - " + self.task.name
-
-class SprintTaskComment(models.Model):
-    sprinttask = models.ForeignKey(SprintTask)
     created_by = models.ForeignKey(User)
     comment = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True, default=datetime.datetime.now(), verbose_name="Created at")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created at")
 
 class WorkHour(models.Model):
     user = models.ForeignKey(User)
-    sprinttask = models.ForeignKey(SprintTask)
+    task = models.ForeignKey(Task)
     day = models.DateField(default=datetime.date.today())
     time = models.FloatField()
     created_at = models.DateTimeField(auto_now_add=True)
