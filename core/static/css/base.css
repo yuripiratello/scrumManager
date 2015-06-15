@@ -188,22 +188,24 @@ footer p {
   padding-top: 25px;
 }
 
-.historia-status-1 td {
-  background-color: #FFD;
+.historia-status-1 td{
+border-left: solid 5px #FFA022;
+color: #D2831A;
 }
 
-.historia-status-2 td {
-  background-color: #D9FAD9;
+.historia-status-2 td:first-child {
+border-left: solid 5px #72CA72;
+color: #759875;
 }
 
-.historia-status-3 td {
-  color: rgba(51, 51, 51, 0.4);
+.historia-status-3 td:first-child{
+color: rgba(51, 51, 51, 0.4);
+border-left: solid 5px rgba(147, 147, 147, 0.4);
+}
+.historia-status-3 .ui-widget{
+opacity: .4;
 }
 
-.historia-status-3 .ui-widget {
-  opacity: .4;
-}
-
-.historia-status-0 td {
-  background-color: #D0F1FF;
+.historia-status-0 td:first-child{
+border-left: solid 5px #939393;
 }
