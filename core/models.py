@@ -58,9 +58,17 @@ class Project(models.Model):
     def __unicode__(self):
         return self.name
 
+STATUS_HISTORY = (
+    (0, 'Em espera'),
+    (1, 'Executando'),
+    (2, 'Completa'),
+    (3, 'Cancelada')
+)
+
 class History(models.Model):
     project = models.ForeignKey(Project)
     sprint = models.ForeignKey('Sprint', null=True, blank=True)
+    status = models.IntegerField(choices=STATUS_HISTORY, default=0)
     name = models.CharField(max_length=100)
     weight = models.IntegerField(null=True, blank=True, default=0, help_text='Peso da Historia dentro do Projeto para o Product Owner')
     priority = models.IntegerField(null=True, blank=True, default=0, help_text='Prioridade da história.')
