@@ -103,7 +103,7 @@
     {% if historias %}
         {% for historia, status in historias.items %}
       <tbody>
-        <tr>
+        <tr class="historia-status-{{ historia.status }}">
             <td>
                 <div>
                     <!--b>História:</b>

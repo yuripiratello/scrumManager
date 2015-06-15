@@ -59,8 +59,8 @@ class Taskinlines(admin.TabularInline):
 
 class HistoryAdmin(admin.ModelAdmin):
     inlines = [Taskinlines,]
-    list_display = ['name','project', 'sprint','weight','priority','estimate','created_by','created_at',]
-    list_filter = ['project','created_by','created_at','sprint']
+    list_display = ['name','project', 'sprint', 'status','weight','priority','estimate','created_by','created_at',]
+    list_filter = ['project','created_by','created_at','sprint', 'status']
     exclude = ['created_by']
     ordering = ['sprint','priority']
 

@@ -187,3 +187,19 @@ footer {
 footer p {
   padding-top: 25px;
 }
+
+.historia-status-1 {
+  border: 1px solid yellow;
+}
+
+.historia-status-2 {
+  border: 1px solid green;
+}
+
+.historia-status-3 {
+  border: 1px solid red;
+}
+
+.historia-status-4 {
+  border: 1px solid orange;
+}
